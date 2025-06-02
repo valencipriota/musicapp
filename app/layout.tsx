@@ -1,4 +1,3 @@
-// app/layout.tsx
 export const metadata = {
   title: "musicapp",
   description: "Tu Letterboxd de canciones",
