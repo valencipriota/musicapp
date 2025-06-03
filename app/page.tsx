@@ -1,7 +1,12 @@
+import SongForm from "./components/SongForm";
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-black text-white">
-      <h1 className="text-3xl font-bold">🎵 Tu Letterboxd musical está en marcha</h1>
+    <main style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+      <h1>🎵 Tu Letterboxd musical</h1>
+      <p>Puntúa una canción, dejá tu review y descubrí lo que otros opinan.</p>
+
+      <SongForm />
     </main>
   );
 }
