@@ -1,64 +1,64 @@
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function SongForm() {
-  const [title, setTitle] = useState("");
+  const [song, setSong] = useState("");
   const [rating, setRating] = useState(2.5);
   const [review, setReview] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [reviews, setReviews] = useState([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const stored = localStorage.getItem("reviews");
+    if (stored) setReviews(JSON.parse(stored));
+  }, []);
+
+  function handleSubmit(e) {
     e.preventDefault();
-    console.log("Canción:", title);
-    console.log("Puntaje:", rating);
-    console.log("Review:", review);
-    setSubmitted(true);
-  };
+    const newReview = { song, rating, review };
+    const updated = [newReview, ...reviews];
+    setReviews(updated);
+    localStorage.setItem("reviews", JSON.stringify(updated));
+    setSuccess(true);
+    setSong("");
+    setRating(2.5);
+    setReview("");
+    setTimeout(() => setSuccess(false), 3000);
+  }
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginTop: "2rem" }}>
-      <div>
-        <label>🎧 Nombre de la canción:</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-          style={{ display: "block", width: "100%", marginBottom: "1rem" }}
-        />
-      </div>
+    <div style={{ maxWidth: 500, margin: "0 auto", fontFamily: "sans-serif" }}>
+      <form onSubmit={handleSubmit}>
+        <label>
+          <span role="img" aria-label="note">🎵</span> Nombre de la canción:
+          <input value={song} onChange={e => setSong(e.target.value)} required style={{ width: "100%" }} />
+        </label>
 
-      <div>
-        <label>⭐ Puntaje (0 a 5): {rating}</label>
-        <input
-          type="range"
-          min="0"
-          max="5"
-          step="0.25"
-          value={rating}
-          onChange={(e) => setRating(parseFloat(e.target.value))}
-          style={{ width: "100%", marginBottom: "1rem" }}
-        />
-      </div>
+        <label>
+          <span role="img" aria-label="star">⭐</span> Puntaje (0 a 5): {rating.toFixed(2)}
+          <input type="range" min="0" max="5" step="0.25" value={rating} onChange={e => setRating(parseFloat(e.target.value))} style={{ width: "100%" }} />
+        </label>
 
-      <div>
-        <label>💬 Review:</label>
-        <textarea
-          value={review}
-          onChange={(e) => setReview(e.target.value)}
-          rows={4}
-          style={{ width: "100%", marginBottom: "1rem" }}
-        />
-      </div>
+        <label>
+          <span role="img" aria-label="review">📝</span> Review:
+          <textarea value={review} onChange={e => setReview(e.target.value)} required style={{ width: "100%" }} />
+        </label>
 
-      <button type="submit">Enviar</button>
+        <button type="submit" style={{ marginTop: 10 }}>Enviar</button>
+      </form>
 
-      {submitted && (
-        <p style={{ marginTop: "1rem", color: "green" }}>
-          ✅ ¡Review enviada! (la consola del navegador la tiene)
-        </p>
-      )}
-    </form>
+      {success && <p style={{ color: "green" }}>✅ ¡Review enviada!</p>}
+
+      <hr />
+      <h2>Canciones puntuadas</h2>
+      {reviews.length === 0 && <p>No hay canciones aún.</p>}
+      <ul>
+        {reviews.map((r, i) => (
+          <li key={i} style={{ marginBottom: 10 }}>
+            <strong>{r.song}</strong> — ⭐ {r.rating}/5<br />
+            <em>{r.review}</em>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
